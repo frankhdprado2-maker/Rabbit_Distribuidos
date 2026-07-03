@@ -1,0 +1,35 @@
+EXCHANGE_NAME = "fisi.ordenes.exchange"
+DLX_NAME = "fisi.ordenes.dlx"
+
+QUEUE_INVENTARIO = "cola_inventario"
+QUEUE_RESERVA = "cola_reserva"
+QUEUE_FACTURACION = "cola_facturacion"
+QUEUE_CXC = "cola_cxc"
+QUEUE_RESPUESTA = "cola_respuesta"
+QUEUE_ERRORES = "cola_errores"
+
+RK_INVENTARIO_VALIDAR = "inventario.validar"
+RK_RESERVA_CREAR = "reserva.crear"
+RK_FACTURA_GENERAR = "factura.generar"
+RK_CUENTA_CREAR = "cuenta.crear"
+RK_ORDEN_CONFIRMAR = "orden.confirmar"
+RK_ORDEN_ERROR = "orden.error"
+RK_ERROR_TECNICO = "error.tecnico"
+
+ORDER_STATUS_PENDIENTE = "PENDIENTE"
+ORDER_STATUS_VALIDANDO_STOCK = "VALIDANDO_STOCK"
+ORDER_STATUS_RESERVADA = "RESERVADA"
+ORDER_STATUS_FACTURADA = "FACTURADA"
+ORDER_STATUS_CUENTA_CREADA = "CUENTA_CREADA"
+ORDER_STATUS_CONFIRMADA = "CONFIRMADA"
+ORDER_STATUS_RECHAZADA = "RECHAZADA"
+ORDER_STATUS_ERROR = "ERROR"
+
+SERVICE_ORDENES = "procesamiento-ordenes"
+SERVICE_INVENTARIO = "inventario"
+SERVICE_RESERVA = "reserva"
+SERVICE_FACTURACION = "facturacion"
+SERVICE_CXC = "cuentas-cobrar"
+
+EVENT_VERSION = 1
+CONTENT_TYPE_JSON = "application/json"
