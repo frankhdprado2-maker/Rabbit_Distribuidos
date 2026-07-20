@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fisi.local/contracts/event-envelope.schema.json",
+  "title": "FISI Event Envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["message_id", "event_type", "event_version", "correlation_id", "causation_id", "id_orden", "timestamp", "source", "attempt", "payload"],
+  "properties": {
+    "message_id": {"type": "string", "format": "uuid"},
+    "event_type": {"type": "string", "enum": ["inventario.validar", "reserva.crear", "factura.generar", "cuenta.crear", "orden.confirmar", "orden.error", "error.tecnico", "reserva.liberar"]},
+    "event_version": {"const": 1},
+    "correlation_id": {"type": "string", "format": "uuid"},
+    "causation_id": {"type": ["string", "null"], "format": "uuid"},
+    "id_orden": {"type": "string", "pattern": "^ORD-[0-9]{4}-[0-9]{6}$"},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "source": {"type": "string", "minLength": 1},
+    "attempt": {"type": "integer", "minimum": 0},
+    "payload": {"type": "object"}
+  }
+}

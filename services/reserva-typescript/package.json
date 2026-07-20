@@ -1,0 +1,5 @@
+{
+  "name":"fisi-reserva","version":"1.0.0","private":true,"scripts":{"build":"tsc","start":"node dist/index.js","test":"npm run build && node --test dist/tests/*.test.js"},
+  "dependencies":{"amqplib":"0.10.5","pg":"8.13.1"},
+  "devDependencies":{"@types/amqplib":"0.10.6","@types/node":"22.10.7","@types/pg":"8.11.11","typescript":"5.7.3"}
+}

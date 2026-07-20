@@ -1,4 +1,11 @@
 .venv/
+**/node_modules/
+**/dist/
+**/bin/
+**/obj/
+**/target/
+**/__pycache__/
+.pytest_cache/
 __pycache__/
 *.py[cod]
 

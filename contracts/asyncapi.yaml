@@ -1,0 +1,23 @@
+asyncapi: 2.6.0
+info:
+  title: FISI Orquestacion de Ordenes
+  version: 1.0.0
+  description: Contrato poliglota JSON UTF-8 transportado por RabbitMQ.
+servers:
+  rabbitmq:
+    url: rabbitmq:5672
+    protocol: amqp
+channels:
+  inventario.validar: {publish: {message: {$ref: '#/components/messages/Event'}}}
+  reserva.crear: {publish: {message: {$ref: '#/components/messages/Event'}}}
+  factura.generar: {publish: {message: {$ref: '#/components/messages/Event'}}}
+  cuenta.crear: {publish: {message: {$ref: '#/components/messages/Event'}}}
+  orden.confirmar: {publish: {message: {$ref: '#/components/messages/Event'}}}
+  orden.error: {publish: {message: {$ref: '#/components/messages/Event'}}}
+  error.tecnico: {publish: {message: {$ref: '#/components/messages/Event'}}}
+components:
+  messages:
+    Event:
+      contentType: application/json
+      payload:
+        $ref: ./event-envelope.schema.json
