@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fisi.local/contracts/inventario-validar.schema.json",
+  "title": "inventario.validar payload",
+  "$ref": "#/$defs/payload",
+  "$defs": {
+    "item": {"type":"object","additionalProperties":false,"required":["codigo_articulo","cantidad"],"properties":{"codigo_articulo":{"type":"string","minLength":1},"cantidad":{"type":"integer","minimum":1}}},
+    "cliente": {"type":"object","additionalProperties":false,"required":["cliente_id","nombre_cliente","ruc_cliente"],"properties":{"cliente_id":{"type":"string","minLength":1},"nombre_cliente":{"type":"string","minLength":1},"ruc_cliente":{"type":"string","pattern":"^[0-9]{11}$"}}},
+    "payload": {"type":"object","additionalProperties":false,"required":["cliente","items"],"properties":{"cliente":{"$ref":"#/$defs/cliente"},"items":{"type":"array","minItems":1,"items":{"$ref":"#/$defs/item"}},"trace":{"type":"array","items":{"type":"object"}}}}
+  }
+}

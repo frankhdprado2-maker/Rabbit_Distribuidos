@@ -1,0 +1,10 @@
+CREATE USER ordenes_user WITH PASSWORD 'ordenes_dev';
+CREATE USER inventario_user WITH PASSWORD 'inventario_dev';
+CREATE USER reserva_user WITH PASSWORD 'reserva_dev';
+CREATE USER facturacion_user WITH PASSWORD 'facturacion_dev';
+CREATE USER cxc_user WITH PASSWORD 'cxc_dev';
+CREATE DATABASE db_ordenes OWNER ordenes_user;
+CREATE DATABASE db_inventario OWNER inventario_user;
+CREATE DATABASE db_reserva OWNER reserva_user;
+CREATE DATABASE db_facturacion OWNER facturacion_user;
+CREATE DATABASE db_cxc OWNER cxc_user;

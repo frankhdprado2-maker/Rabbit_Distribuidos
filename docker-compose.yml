@@ -1,22 +1,129 @@
+name: fisi-ordenes-poliglota
 services:
   rabbitmq:
-    image: rabbitmq:3-management
-    container_name: fisi-rabbitmq
-    restart: unless-stopped
+    image: rabbitmq:3.13.7-management-alpine
+    hostname: rabbitmq
+    user: "100:101"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-fisi}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-fisi_dev}
     ports:
       - "5672:5672"
       - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
-    networks:
-      - fisi_backend
+      - ./infrastructure/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+      - ./infrastructure/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [fisi_backend]
+
+  postgres:
+    image: postgres:16.6-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_ADMIN_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD:-postgres_dev}
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/database/init.sql:/docker-entrypoint-initdb.d/01-databases.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [fisi_backend]
+
+  ordenes-python:
+    build: ./services/ordenes-python
+    environment: &common
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: ${RABBITMQ_USER:-fisi}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-fisi_dev}
+      MAX_RETRIES: ${MAX_RETRIES:-3}
+      RETRY_DELAY_MS: ${RETRY_DELAY_MS:-5000}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      DATABASE_URL: postgresql://ordenes_user:ordenes_dev@postgres:5432/db_ordenes
+    ports: ["8000:8000"]
+    depends_on:
+      rabbitmq: {condition: service_healthy}
+      postgres: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [fisi_backend]
+
+  inventario-java:
+    build: ./services/inventario-java
+    environment:
+      <<: *common
+      DATABASE_URL: jdbc:postgresql://postgres:5432/db_inventario
+      DB_USER: inventario_user
+      DB_PASSWORD: ${INVENTARIO_DB_PASSWORD:-inventario_dev}
+    depends_on:
+      rabbitmq: {condition: service_healthy}
+      postgres: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks: [fisi_backend]
+
+  reserva-typescript:
+    build: ./services/reserva-typescript
+    environment:
+      <<: *common
+      DATABASE_URL: postgresql://reserva_user:${RESERVA_DB_PASSWORD:-reserva_dev}@postgres:5432/db_reserva
+    depends_on:
+      rabbitmq: {condition: service_healthy}
+      postgres: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8082/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks: [fisi_backend]
+
+  facturacion-dotnet:
+    build: ./services/facturacion-dotnet
+    environment:
+      <<: *common
+      DATABASE_URL: Host=postgres;Database=db_facturacion;Username=facturacion_user;Password=${FACTURACION_DB_PASSWORD:-facturacion_dev}
+    depends_on:
+      rabbitmq: {condition: service_healthy}
+      postgres: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD-SHELL", "test -d /proc/1 && grep -q dotnet /proc/1/cmdline"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks: [fisi_backend]
+
+  cxc-go:
+    build: ./services/cxc-go
+    environment:
+      <<: *common
+      DATABASE_URL: postgresql://cxc_user:${CXC_DB_PASSWORD:-cxc_dev}@postgres:5432/db_cxc
+    depends_on:
+      rabbitmq: {condition: service_healthy}
+      postgres: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8084/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks: [fisi_backend]
 
 volumes:
   rabbitmq_data:
-
+  postgres_data:
 networks:
   fisi_backend:
+    name: fisi_backend
     driver: bridge

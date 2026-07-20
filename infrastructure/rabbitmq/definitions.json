@@ -1,0 +1,27 @@
+{
+  "users":[{"name":"fisi","password_hash":"+6BH5h7p8H6jlnrH69DijMWdPE7TjGrjvWoyCVMRTnl8byiu","hashing_algorithm":"rabbit_password_hashing_sha256","tags":["administrator"]}],
+  "vhosts":[{"name":"/"}],
+  "permissions":[{"user":"fisi","vhost":"/","configure":".*","write":".*","read":".*"}],
+  "exchanges":[
+    {"name":"fisi.ordenes.exchange","vhost":"/","type":"direct","durable":true,"auto_delete":false,"internal":false,"arguments":{}},
+    {"name":"fisi.ordenes.dlx","vhost":"/","type":"direct","durable":true,"auto_delete":false,"internal":false,"arguments":{}}
+  ],
+  "queues":[
+    {"name":"cola_inventario","vhost":"/","durable":true,"auto_delete":false,"arguments":{"x-dead-letter-exchange":"fisi.ordenes.dlx","x-dead-letter-routing-key":"error.tecnico"}},
+    {"name":"cola_reserva","vhost":"/","durable":true,"auto_delete":false,"arguments":{"x-dead-letter-exchange":"fisi.ordenes.dlx","x-dead-letter-routing-key":"error.tecnico"}},
+    {"name":"cola_facturacion","vhost":"/","durable":true,"auto_delete":false,"arguments":{"x-dead-letter-exchange":"fisi.ordenes.dlx","x-dead-letter-routing-key":"error.tecnico"}},
+    {"name":"cola_cxc","vhost":"/","durable":true,"auto_delete":false,"arguments":{"x-dead-letter-exchange":"fisi.ordenes.dlx","x-dead-letter-routing-key":"error.tecnico"}},
+    {"name":"cola_respuesta","vhost":"/","durable":true,"auto_delete":false,"arguments":{"x-dead-letter-exchange":"fisi.ordenes.dlx","x-dead-letter-routing-key":"error.tecnico"}},
+    {"name":"cola_errores","vhost":"/","durable":true,"auto_delete":false,"arguments":{}}
+  ],
+  "bindings":[
+    {"source":"fisi.ordenes.exchange","vhost":"/","destination":"cola_inventario","destination_type":"queue","routing_key":"inventario.validar","arguments":{}},
+    {"source":"fisi.ordenes.exchange","vhost":"/","destination":"cola_inventario","destination_type":"queue","routing_key":"reserva.liberar","arguments":{}},
+    {"source":"fisi.ordenes.exchange","vhost":"/","destination":"cola_reserva","destination_type":"queue","routing_key":"reserva.crear","arguments":{}},
+    {"source":"fisi.ordenes.exchange","vhost":"/","destination":"cola_facturacion","destination_type":"queue","routing_key":"factura.generar","arguments":{}},
+    {"source":"fisi.ordenes.exchange","vhost":"/","destination":"cola_cxc","destination_type":"queue","routing_key":"cuenta.crear","arguments":{}},
+    {"source":"fisi.ordenes.exchange","vhost":"/","destination":"cola_respuesta","destination_type":"queue","routing_key":"orden.confirmar","arguments":{}},
+    {"source":"fisi.ordenes.exchange","vhost":"/","destination":"cola_respuesta","destination_type":"queue","routing_key":"orden.error","arguments":{}},
+    {"source":"fisi.ordenes.dlx","vhost":"/","destination":"cola_errores","destination_type":"queue","routing_key":"error.tecnico","arguments":{}}
+  ]
+}

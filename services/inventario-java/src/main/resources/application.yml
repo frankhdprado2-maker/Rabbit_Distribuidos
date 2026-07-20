@@ -1,0 +1,20 @@
+spring:
+  application.name: inventario
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://postgres:5432/db_inventario}
+    username: ${DB_USER:inventario_user}
+    password: ${DB_PASSWORD:inventario_dev}
+  rabbitmq:
+    host: ${RABBITMQ_HOST:rabbitmq}
+    port: 5672
+    username: ${RABBITMQ_USER:fisi}
+    password: ${RABBITMQ_PASSWORD:fisi_dev}
+    connection-timeout: 30s
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    listener.simple:
+      acknowledge-mode: manual
+      prefetch: 1
+      default-requeue-rejected: false
+management.endpoints.web.exposure.include: health
+server.port: 8081
